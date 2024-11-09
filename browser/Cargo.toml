@@ -1,0 +1,8 @@
+[package]
+name = "browser"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Dependencies used for browser on WasabiOS
+noli = { git = "https://github.com/hikalium/wasabi.git", branch = "for_saba" }
