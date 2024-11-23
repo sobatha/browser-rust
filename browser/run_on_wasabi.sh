@@ -20,9 +20,9 @@ fi
 if [ -d $OS_PATH ]
 then
   echo $OS_PATH" exists"
-  # echo "pulling new changes..."
+  echo "pulling new changes..."
   cd $OS_PATH
-  # git pull origin for_saba
+  git pull origin for_saba
 else
   echo $OS_PATH" doesn't exist"
   echo "cloning wasabi project..."
@@ -36,7 +36,7 @@ cd $HOME_PATH
 # download Makefile if it doesn't exist
 if [ ! -f $MAKEFILE_PATH ]; then
   echo "downloading Makefile..."
-  wget https://raw.githubusercontent.com/hikalium/wasabi/main/external_app_template/Makefile
+  wget https://raw.githubusercontent.com/hikalium/wasabi/for_saba/external_app_template/Makefile
 fi
 
 make build
