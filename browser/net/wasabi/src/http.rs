@@ -1,5 +1,7 @@
 extern crate alloc;
-use alloc::string::String;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 use noli::net::{lookup_host, SocketAddr, TcpStream};
 use saba_core::error::Error;
 use saba_core::http::HttpResponse;
@@ -12,7 +14,7 @@ impl HttpClient {
     }
 
     pub fn get(&self, host: String, port: u16, path: String) -> Result<HttpResponse, Error> {
-        let socker_addr = lookup_socker_addr(&host, port);
+        let socker_addr = Self::lookup_socket_addr(&host, port)?;
 
         let mut stream = match TcpStream::connect(socker_addr) {
             Ok(stream) => stream,
@@ -23,16 +25,16 @@ impl HttpClient {
             }
         };
 
-        let request = build_get_request(&host, &path);
+        let request = Self::build_get_request(&host, &path);
         let _bytes_written = stream
             .write(request.as_bytes())
-            .map_err(|e| Error::Network("Failed to send a request to TCP stream".to_string))?;
+            .map_err(|e| Error::Network("Failed to send a request to TCP stream".to_string()))?;
 
         let mut received = Vec::new();
         loop {
             let mut buf = [0u8; 4096];
-            let bytes_read = stream.read(&mut buf).map_err(|| {
-                Erorr::Network("Failed to receive a request from RCP stream".to_string())
+            let bytes_read = stream.read(&mut buf).map_err(|e| {
+                Error::Network("Failed to receive a request from RCP stream".to_string())
             })?;
 
             if bytes_read == 0 {
@@ -45,7 +47,7 @@ impl HttpClient {
         let raw_response = core::str::from_utf8(&received)
             .map_err(|e| Error::Network(format!("Invalid received response: {e}")))?;
 
-        return Ok(HttpResponse::new(*raw_response));
+        return HttpResponse::new(raw_response.to_string());
     }
 
     fn build_get_request(host: &str, path: &str) -> String {
